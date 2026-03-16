@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>PREMA-CHD 1-Year Mortality Score</title>
+
+<style>
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:#f4f6f9;
+  margin:0;
+  color:#111827;
+}
+
+.header{
+  background:#0f172a;
+  color:white;
+  padding:28px;
+  text-align:center;
+}
+
+.header h1{
+  margin:0;
+  font-size:26px;
+}
+
+.header p{
+  margin-top:8px;
+  font-size:14px;
+  color:#cbd5e1;
+}
+
+.container{
+  max-width:980px;
+  margin:auto;
+  padding:30px 20px 40px 20px;
+}
+
+.card{
+  background:white;
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:20px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+h2{
+  margin-top:0;
+  margin-bottom:18px;
+}
+
+.variable{
+  display:flex;
+  align-items:center;
+  padding:14px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  margin-bottom:12px;
+}
+
+.variable label{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  width:100%;
+  cursor:pointer;
+}
+
+.variable span.label-text{
+  flex:1;
+}
+
+.variable small{
+  color:#6b7280;
+}
+
+select{
+  padding:8px 10px;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  font-size:15px;
+  background:white;
+}
+
+.result{
+  text-align:center;
+}
+
+.score{
+  font-size:64px;
+  font-weight:700;
+  line-height:1;
+  color:#111827;
+  min-height:72px;
+}
+
+.risk{
+  font-size:24px;
+  font-weight:700;
+  margin-top:12px;
+  min-height:32px;
+}
+
+.low{ color:#16a34a; }
+.mid{ color:#d97706; }
+.high{ color:#dc2626; }
+
+.subtext{
+  margin-top:8px;
+  font-size:15px;
+  color:#6b7280;
+  min-height:22px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:18px;
+}
+
+th, td{
+  padding:12px;
+  border-top:1px solid #e5e7eb;
+  text-align:left;
+  vertical-align:top;
+}
+
+th{
+  background:#f9fafb;
+}
+
+.footer{
+  margin-top:14px;
+  font-size:13px;
+  color:#6b7280;
+  line-height:1.5;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  background:#eef2ff;
+  color:#3730a3;
+}
+
+.note{
+  margin-top:10px;
+  font-size:13px;
+  color:#6b7280;
+}
+
+.points-box{
+  margin-top:10px;
+  font-size:15px;
+  color:#374151;
+  min-height:24px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+@media (max-width: 780px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PREMA-CHD 1-Year Mortality Score</h1>
+  <p>
+    Baseline model derived from a multicentric french cohort of 213 preterm patients with significant CHD
+  </p>
+</div>
+
+<div class="container">
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>Clinical Variables</h2>
+
+      <div class="variable">
+        <label for="ga">
+          <span class="label-text">
+            <strong>Gestational age</strong><br>
+            <small>Choose an integer value from 24 to 36 completed weeks</small>
+          </span>
+          <select id="ga">
+            <option value="" selected></option>
+          </select>
+        </label>
+      </div>
+
+      <div class="variable">
+        <label for="apgar">
+          <span class="label-text">
+            <strong>10-minute Apgar score</strong><br>
+            <small>Choose an integer value from 0 to 10</small>
+          </span>
+          <select id="apgar">
+            <option value="" selected></option>
+          </select>
+        </label>
+      </div>
+
+      <div class="variable">
+        <label>
+          <input type="checkbox" id="genetic">
+          <span class="label-text">
+            <strong>Genetic / syndromic anomaly</strong>
+          </span>
+        </label>
+      </div>
+
+      <div class="variable">
+        <label>
+          <input type="checkbox" id="mixing">
+          <span class="label-text">
+            <strong>Mixing CHD physiology</strong>
+          </span>
+        </label>
+      </div>
+
+      <div class="variable">
+        <label>
+          <input type="checkbox" id="prostine">
+          <span class="label-text">
+            <strong>Prostaglandin infusion</strong>
+          </span>
+        </label>
+      </div>
+
+      <div class="points-box" id="termPointsText"></div>
+    </div>
+
+    <div class="card result">
+      <h2>Total Score</h2>
+
+      <div class="score" id="score"></div>
+      <div class="risk" id="riskText"></div>
+      <div class="subtext" id="scoreRule"></div>
+
+      <table>
+        <tr>
+          <th>Risk category</th>
+          <td id="category"></td>
+        </tr>
+        <tr>
+          <th>Score range</th>
+          <td id="range"></td>
+        </tr>
+        <tr>
+          <th>Observed 1-year mortality</th>
+          <td id="mortality"></td>
+        </tr>
+        <tr>
+          <th>95% CI</th>
+          <td id="ci"></td>
+        </tr>
+      </table>
+
+      <div class="note">
+        This output reflects <strong>observed mortality in the derivation cohort</strong>,
+        not an individual predicted probability from the logistic equation.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h2>Score Construction</h2>
+
+    <div class="badge">Point-based score</div>
+
+    <table>
+      <tr>
+        <th>Variable</th>
+        <th>β coefficient (report)</th>
+        <th>β coefficient (recalculated)</th>
+        <th>Assigned points</th>
+      </tr>
+      <tr>
+        <td>Gestational age (per week)</td>
+        <td>-0.1804</td>
+        <td>-0.1804</td>
+        <td>
+          35–36 = 0<br>
+          32–34 = 1<br>
+          29–31 = 2<br>
+          26–28 = 3<br>
+          24–25 = 4
+        </td>
+      </tr>
+      <tr>
+        <td>10-minute Apgar score</td>
+        <td>-0.3384</td>
+        <td>-0.3384</td>
+        <td>
+          9–10 = 0<br>
+          7–8 = 1<br>
+          5–6 = 2<br>
+          3–4 = 3<br>
+          0–2 = 4
+        </td>
+      </tr>
+      <tr>
+        <td>Genetic / syndromic anomaly</td>
+        <td>+1.4285</td>
+        <td>+1.4285</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>Mixing CHD physiology</td>
+        <td>+1.4245</td>
+        <td>+1.4245</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>Prostaglandin infusion</td>
+        <td>+1.0340</td>
+        <td>+1.0340</td>
+        <td>2</td>
+      </tr>
+    </table>
+
+    <div class="footer">
+      Total score range: <strong>0 to 13 points</strong>.<br>
+      Risk groups based on the derivation cohort (n = 211 complete cases):
+      <strong>0–3 points</strong>, <strong>4–6 points</strong>, and <strong>&ge;7 points</strong>.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const gaSelect = document.getElementById("ga");
+const apgarSelect = document.getElementById("apgar");
+const genetic = document.getElementById("genetic");
+const mixing = document.getElementById("mixing");
+const prostine = document.getElementById("prostine");
+
+for(let i = 24; i <= 36; i++){
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = i + " weeks";
+  gaSelect.appendChild(option);
+}
+
+for(let i = 0; i <= 10; i++){
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = i;
+  apgarSelect.appendChild(option);
+}
+
+const inputs = document.querySelectorAll("input, select");
+inputs.forEach(el => el.addEventListener("change", calculate));
+
+function getTermPoints(ga){
+  if(ga >= 35) return 0;
+  if(ga >= 32) return 1;
+  if(ga >= 29) return 2;
+  if(ga >= 26) return 3;
+  return 4;
+}
+
+function getApgarPoints(apgar){
+  if(apgar >= 9) return 0;
+  if(apgar >= 7) return 1;
+  if(apgar >= 5) return 2;
+  if(apgar >= 3) return 3;
+  return 4;
+}
+
+function clearOutput(){
+  document.getElementById("score").innerText = "";
+  document.getElementById("riskText").innerText = "";
+  document.getElementById("riskText").className = "risk";
+  document.getElementById("scoreRule").innerText = "";
+  document.getElementById("category").innerText = "";
+  document.getElementById("range").innerText = "";
+  document.getElementById("mortality").innerText = "";
+  document.getElementById("ci").innerText = "";
+  document.getElementById("termPointsText").innerHTML = "";
+}
+
+function calculate(){
+  const gaValue = gaSelect.value;
+  const apgarValue = apgarSelect.value;
+
+  if(gaValue === "" || apgarValue === ""){
+    clearOutput();
+    return;
+  }
+
+  const ga = parseInt(gaValue, 10);
+  const apgar = parseInt(apgarValue, 10);
+
+  const termPoints = getTermPoints(ga);
+  const apgarPoints = getApgarPoints(apgar);
+
+  let score = 0;
+  score += termPoints;
+  score += apgarPoints;
+  if(genetic.checked) score += 3;
+  if(mixing.checked) score += 3;
+  if(prostine.checked) score += 2;
+
+  document.getElementById("score").innerText = score;
+  document.getElementById("termPointsText").innerHTML =
+    'Gestational age points: <strong>' + termPoints + '</strong><br>' +
+    'Apgar points: <strong>' + apgarPoints + '</strong>';
+
+  let category = "";
+  let range = "";
+  let mortality = "";
+  let ci = "";
+  let color = "";
+  let riskText = "";
+
+  if(score <= 3){
+    category = "Low risk";
+    range = "0–3";
+    mortality = "7.4%";
+    ci = "3.5–13.7%";
+    color = "low";
+    riskText = "Low risk";
+  } else if(score <= 6){
+    category = "Intermediate risk";
+    range = "4–6";
+    mortality = "27.1%";
+    ci = "16.4–40.3%";
+    color = "mid";
+    riskText = "Intermediate risk";
+  } else {
+    category = "High risk";
+    range = "≥7";
+    mortality = "61.3%";
+    ci = "42.2–78.2%";
+    color = "high";
+    riskText = "High risk";
+  }
+
+  const riskEl = document.getElementById("riskText");
+  riskEl.innerText = riskText;
+  riskEl.className = "risk " + color;
+
+  document.getElementById("scoreRule").innerText = "Score " + range;
+  document.getElementById("category").innerText = category;
+  document.getElementById("range").innerText = range;
+  document.getElementById("mortality").innerText = mortality;
+  document.getElementById("ci").innerText = ci;
+}
+
+clearOutput();
+</script>
+
+</body>
+</html>
